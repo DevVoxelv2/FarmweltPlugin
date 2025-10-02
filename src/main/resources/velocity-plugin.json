@@ -1,0 +1,7 @@
+{
+  "id": "farmweltplugin",
+  "name": "FarmweltPlugin",
+  "version": "1.0.0",
+  "main": "de.farmwelt.farmweltplugin.FarmweltPlugin",
+  "authors": ["Farmwelt"]
+}
