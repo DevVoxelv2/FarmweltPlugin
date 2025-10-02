@@ -7,6 +7,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.Optional;
 
@@ -14,6 +15,9 @@ import java.util.Optional;
  * Command that connects a player to a configured server.
  */
 public final class ConnectCommand implements SimpleCommand {
+
+    private static final Component PREFIX = LegacyComponentSerializer.legacyAmpersand()
+            .deserialize("&b&lCraftCity &8&l»&r ");
 
     private final ProxyServer proxyServer;
     private final String targetServerId;
@@ -30,22 +34,21 @@ public final class ConnectCommand implements SimpleCommand {
         CommandSource source = invocation.source();
 
         if (!(source instanceof Player player)) {
-            source.sendMessage(Component.text("Dieser Befehl kann nur von Spielern verwendet werden.", NamedTextColor.RED));
+            source.sendMessage(PREFIX.append(Component.text("Dieser Befehl kann nur von Spielern verwendet werden.", NamedTextColor.RED)));
             return;
         }
 
         Optional<RegisteredServer> server = proxyServer.getServer(targetServerId);
         if (server.isEmpty()) {
-            player.sendMessage(Component.text("Der Server " + displayName + " ist nicht verfügbar.", NamedTextColor.RED));
+            player.sendMessage(PREFIX.append(Component.text("Der Server " + displayName + " ist nicht verfügbar.", NamedTextColor.RED)));
             return;
         }
 
         player.createConnectionRequest(server.get()).connect().thenAccept(result -> {
             if (!result.isSuccessful()) {
-                Component reason = result.getReason().orElse(Component.text("Unbekannter Fehler", NamedTextColor.RED));
-                player.sendMessage(Component.text("Verbindung zu " + displayName + " fehlgeschlagen: ", NamedTextColor.RED).append(reason));
+                player.sendMessage(PREFIX.append(Component.text("Verbindung zu " + displayName + " fehlgeschlagen. Bitte versuche es später erneut.", NamedTextColor.RED)));
             } else {
-                player.sendMessage(Component.text("Du wirst nun mit " + displayName + " verbunden...", NamedTextColor.GREEN));
+                player.sendMessage(PREFIX.append(Component.text("Du wirst nun mit " + displayName + " verbunden...", NamedTextColor.GREEN)));
             }
         });
     }
